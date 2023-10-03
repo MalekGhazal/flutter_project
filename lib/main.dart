@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_project/login/login_check.dart';
 import '../theme/dark_theme.dart';
 import '../theme/light_theme.dart';
-import '../home/home.dart';
 import 'firebase_options.dart';
 
 Future<void> main(List<String> args) async {
@@ -23,7 +23,9 @@ class TodoApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: lightTheme,
       darkTheme: darkTheme,
-      home: const HomeScreen(),
+      routes: {
+        "/": (context) => const LoginCheck(),
+      },
     );
   }
 }
