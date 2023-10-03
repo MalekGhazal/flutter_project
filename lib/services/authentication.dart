@@ -13,16 +13,23 @@ class AuthService {
     }
   }
 
-  //From https://firebase.google.com/docs/auth/flutter/federated-auth?hl=en&authuser=0#ios+-and-android
-  Future<UserCredential> signInWithGoogle() async {
-    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-    final GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
-    final credential = GoogleAuthProvider.credential(
-      accessToken: googleAuth?.accessToken,
-      idToken: googleAuth?.idToken,
-    );
-    return await FirebaseAuth.instance.signInWithCredential(credential);
-  } 
+  Future<void> googleLogin() async {
+    try {
+      final googleUser = await GoogleSignIn().signIn();
+      if (googleUser == null) return;
+
+      final googleAuth = await googleUser.authentication;
+      final authCredential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      await FirebaseAuth.instance.signInWithCredential(authCredential);
+    } on FirebaseAuthException catch (error) {
+      print("Google sign-in error: $error");
+    }
+  }
+
 
   Future<void> signOut() async {
     await FirebaseAuth.instance.signOut();
