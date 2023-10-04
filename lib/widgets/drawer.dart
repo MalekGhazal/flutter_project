@@ -10,7 +10,7 @@ class TodoDrawer extends StatelessWidget {
       child: ListView(
         children: <Widget>[
           const UserAccountsDrawerHeader(
-            accountName: Text("Your Name"),
+            accountName: Text("User Name"),
             accountEmail: Text("your.email@example.com"),
             currentAccountPicture: CircleAvatar(
               backgroundColor: Colors.transparent,
@@ -35,7 +35,7 @@ class TodoDrawer extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(FontAwesomeIcons.user),
-            title: const Text("Your Profile"),
+            title: const Text("My Profile"),
             onTap: () {
               Navigator.of(context).pop(); // Close the drawer
               Navigator.of(context).pushReplacementNamed('/profile');
