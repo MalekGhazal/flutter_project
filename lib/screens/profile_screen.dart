@@ -11,9 +11,9 @@ class ProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Your Profile'),
+        title: const Text('My Profile'), //
       ),
-      drawer: const TodoDrawer(),
+      drawer: const TodoDrawer(), // Adding a drawer to the screen
       body: Align(
         alignment: Alignment.topCenter,
         child: Column(
@@ -24,17 +24,18 @@ class ProfileScreen extends StatelessWidget {
               child: CircleAvatar(
                 radius: 80.0,
                 backgroundColor: Colors.transparent,
-                backgroundImage: AssetImage('images/ProfilePlaceholder.png'),
+                backgroundImage: AssetImage(
+                    'images/ProfilePlaceholder.png'), // Displaying placeholder profile image
               ),
             ),
             const SizedBox(height: 16.0),
             const Text(
-              'Your Name',
+              'User Name',
               style: TextStyle(fontSize: 24.0),
             ),
             const SizedBox(height: 8.0),
             const Text(
-              'your.email@example.com',
+              'user.email@example.com',
               style: TextStyle(fontSize: 16.0),
             ),
             const SizedBox(
@@ -42,10 +43,11 @@ class ProfileScreen extends StatelessWidget {
             ),
             ElevatedButton(
               onPressed: () async {
-                await AuthService().signOut();
-                Navigator.pushReplacementNamed(context, '/');
+                await AuthService().signOut(); // Triggering sign-out action
+                Navigator.pushReplacementNamed(context,
+                    '/'); // Navigating to the login screen after sign-out
               },
-              child: const Text("Sign out"),
+              child: const Text("Sign out"), // Button to sign out
             ),
           ],
         ),

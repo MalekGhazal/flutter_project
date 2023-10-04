@@ -13,18 +13,24 @@ import 'firebase_options.dart';
 import 'package:provider/provider.dart';
 
 void main(List<String> args) async {
+  // Ensure that Flutter is initialized and ready to use
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Initialize Firebase with the default options for the current platform
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  // Run the app, providing a TodoProvider to manage todos
   runApp(
     MultiProvider(
       providers: [
+        // Create a provider for managing todos using ChangeNotifier
         ChangeNotifierProvider<TodoProvider>(
           create: (_) => TodoProvider(),
         ),
       ],
+      // Start the app by calling the TodoApp widget
       child: const TodoApp(),
     ),
   );
@@ -36,11 +42,19 @@ class TodoApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      // Disable the debug banner in the top-right corner
       debugShowCheckedModeBanner: false,
+
+      // Define the light and dark themes for the app
       theme: lightTheme,
       darkTheme: darkTheme,
+
+      // Define the app's routes for different screens
       routes: {
+        // The default route ("/") leads to the LoginCheck screen
         "/": (context) => const LoginCheck(),
+
+        // Other routes are accessible through the drawer
         DrawerRoutes.todos: (context) => const TodosScreen(),
         DrawerRoutes.weather: (context) => const WeatherScreen(),
         DrawerRoutes.profile: (context) => const ProfileScreen(),
@@ -58,7 +72,10 @@ class DrawerScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Your App Name'),
       ),
-      drawer: const TodoDrawer(), // Use your existing TodoDrawer
+      // Add the TodoDrawer widget as the drawer for this screen
+      drawer: const TodoDrawer(),
+
+      // Set the body of this screen to the LoginCheck widget
       body: const LoginCheck(),
     );
   }

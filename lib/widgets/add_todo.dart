@@ -1,3 +1,5 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
 
 class AddTodo extends StatefulWidget {
@@ -6,7 +8,6 @@ class AddTodo extends StatefulWidget {
   const AddTodo({required this.addTodo, Key? key}) : super(key: key);
 
   @override
-  // ignore: library_private_types_in_public_api
   _AddTodoState createState() => _AddTodoState();
 }
 
@@ -45,7 +46,8 @@ class _AddTodoState extends State<AddTodo> {
               onPressed: () async {
                 final title = titleController.text;
                 final description = descriptionController.text;
-                widget.addTodo(title, description);
+                widget.addTodo(
+                    title, description); // Call the 'addTodo' function
                 Navigator.pop(context);
               },
             ),

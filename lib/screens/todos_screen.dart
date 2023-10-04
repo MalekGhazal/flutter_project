@@ -17,13 +17,16 @@ class TodosScreen extends StatefulWidget {
 }
 
 class TodosState extends State<TodosScreen> {
-  bool loading = false;
-  String activeTab = 'open';
+  bool loading = false; // Indicates whether data is loading
+  String activeTab = 'open'; // Tracks the active tab (open or closed)
 
+  // Function to toggle the status of an open todo
   Future<void> toggleOpenTodo(Todo todo) async {
+    // Determine the status change
     TodoStatus statusModified =
         todo.status == TodoStatus.open ? TodoStatus.closed : TodoStatus.open;
 
+    // Update the todo status and check if it was successful
     bool updated = await Provider.of<TodoProvider>(context, listen: false)
         .toggleTodoStatus(todo, statusModified);
 
@@ -39,12 +42,13 @@ class TodosState extends State<TodosScreen> {
         statusMessage = 'Task closed.';
       }
 
-      // Reload both open and closed todos after the status change.
+      // Reload both open and closed todos after the status change
       await Provider.of<TodoProvider>(context, listen: false).loadMore('open');
       await Provider.of<TodoProvider>(context, listen: false)
           .loadMore('closed');
     }
 
+    // Display a Snackbar to show the status message
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(statusMessage),
@@ -53,6 +57,7 @@ class TodosState extends State<TodosScreen> {
     );
   }
 
+  // Function to toggle the status of a closed todo
   Future<void> toggleClosedTodo(Todo todo) async {
     TodoStatus statusModified =
         todo.status == TodoStatus.open ? TodoStatus.closed : TodoStatus.open;
@@ -81,6 +86,7 @@ class TodosState extends State<TodosScreen> {
     );
   }
 
+  // Function to load more todo items
   void loadMore() async {
     // If we're already loading return early.
     if (loading) {
@@ -102,6 +108,7 @@ class TodosState extends State<TodosScreen> {
     }
   }
 
+  // Function to show the add task sheet
   void showAddTaskSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -140,20 +147,21 @@ class TodosState extends State<TodosScreen> {
             },
           ),
         ),
-        drawer: const TodoDrawer(),
+        drawer: const TodoDrawer(), // Adding a drawer to the screen
         body: TabBarView(
           children: [
-            todoList(
-                context, openTodos, toggleOpenTodo, loadMore, TodoStatus.open),
+            todoList(context, openTodos, toggleOpenTodo, loadMore,
+                TodoStatus.open), // Displaying the list of open todos
             todoList(context, closedTodos, toggleClosedTodo, loadMore,
-                TodoStatus.closed),
+                TodoStatus.closed), // Displaying the list of closed todos
           ],
         ),
         floatingActionButton: FloatingActionButton.extended(
           onPressed: () {
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (context) => const AddTodoScreen(),
+                builder: (context) =>
+                    const AddTodoScreen(), // Navigating to the AddTodoScreen
               ),
             );
           },
