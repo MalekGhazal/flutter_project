@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:flutter_project/widgets/drawer.dart';
 import 'package:flutter_project/services/authentication.dart';
@@ -11,7 +13,7 @@ class ProfileScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Your Profile'),
       ),
-      drawer: const TodoDrawer(), // Remove the 'const' keyword
+      drawer: const TodoDrawer(),
       body: Align(
         alignment: Alignment.topCenter,
         child: Column(
@@ -37,10 +39,11 @@ class ProfileScreen extends StatelessWidget {
             ),
             const SizedBox(
               height: 16.0,
-            ), // Add some spacing between the text and button
+            ),
             ElevatedButton(
               onPressed: () async {
                 await AuthService().signOut();
+                Navigator.pushReplacementNamed(context, '/');
               },
               child: const Text("Sign out"),
             ),
