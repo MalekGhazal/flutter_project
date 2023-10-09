@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
+import 'package:flutter_project/theme/light_theme.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_project/models/todo_model.dart';
 import 'package:flutter_project/providers/todo_provider.dart';
@@ -132,9 +133,12 @@ class TodosState extends State<TodosScreen> {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
+        backgroundColor: Theme.of(context).colorScheme.background,
         appBar: AppBar(
-          title: const Text('To Do List'),
+          title: const RedText('TODO List'),
+          centerTitle: true,
           bottom: TabBar(
+            labelColor: Theme.of(context).colorScheme.primary,
             // Add the TabBar widget for switching tabs
             tabs: const [
               Tab(text: 'Open'),
@@ -145,8 +149,13 @@ class TodosState extends State<TodosScreen> {
                 activeTab = index == 1 ? 'closed' : 'open';
               });
             },
+            labelStyle:
+                const TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0),
+            unselectedLabelStyle:
+                const TextStyle(fontWeight: FontWeight.normal, fontSize: 16.0),
           ),
         ),
+
         drawer: const TodoDrawer(), // Adding a drawer to the screen
         body: TabBarView(
           children: [
@@ -165,8 +174,11 @@ class TodosState extends State<TodosScreen> {
               ),
             );
           },
-          label: const Text('Create Todo'),
-          icon: const Icon(Icons.add),
+          label: const WhiteText('Create Todo'),
+          icon: Icon(
+            Icons.add,
+            color: Theme.of(context).colorScheme.background,
+          ),
         ),
       ),
     );

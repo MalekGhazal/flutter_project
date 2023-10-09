@@ -57,7 +57,7 @@ class TodoApp extends StatelessWidget {
         // Other routes are accessible through the drawer
         DrawerRoutes.todos: (context) => const TodosScreen(),
         DrawerRoutes.weather: (context) => const WeatherScreen(),
-        DrawerRoutes.profile: (context) => const ProfileScreen(),
+        DrawerRoutes.profile: (context) => ProfileScreen(),
       },
     );
   }
