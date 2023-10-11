@@ -40,12 +40,14 @@ class TodoProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> addTodo(String title, String description) async {
+  Future<void> addTodo(
+      String title, String description, DateTime? dueDate) async {
     // Simulate adding a new todo.
     Todo todo = Todo(
       title: title,
       description: description,
       status: TodoStatus.open,
+      dueDate: dueDate,
     );
     _openTodos.insert(0, todo);
     notifyListeners();

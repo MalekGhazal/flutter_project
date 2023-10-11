@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_project/models/todo_model.dart';
+import 'package:intl/intl.dart';
 
 Widget todoList(
   BuildContext context,
   List<Todo> todos,
   Function(Todo) toggleTodo,
   Function() loadMore,
-  TodoStatus status, // Add status parameter
+  TodoStatus status,
 ) {
   ScrollController scrollController = ScrollController();
 
@@ -17,12 +18,11 @@ Widget todoList(
     }
   });
 
-  // Filter todos based on status
   final filteredTodos = todos.where((todo) => todo.status == status).toList();
 
   return ListView.separated(
     controller: scrollController,
-    itemCount: filteredTodos.length, // Use filtered todos
+    itemCount: filteredTodos.length,
     itemBuilder: (BuildContext context, int index) {
       final todo = filteredTodos[index];
       Icon icon;
@@ -48,25 +48,31 @@ Widget todoList(
             },
             child: icon,
           ),
-          title: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                todo.title ?? 'Default Title',
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                ),
-              ),
-              const SizedBox(height: 8),
-            ],
-          ),
-          subtitle: Text(
-            todo.description ?? 'Default Description',
+          title: Text(
+            todo.title ?? 'Default Title',
             style: const TextStyle(
-              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
             ),
           ),
+          subtitle: Container(
+            padding: const EdgeInsets.only(top: 5),
+            child: Text(
+              todo.description ?? 'Default Description',
+              style: const TextStyle(
+                fontSize: 16,
+              ),
+            ),
+          ),
+          trailing: todo.dueDate != null
+              ? Text(
+                  'Due: ${DateFormat('MM/dd/yyyy').format(todo.dueDate!)}',
+                  style: const TextStyle(
+                    color: Colors.blue,
+                    fontSize: 13,
+                  ),
+                )
+              : null,
           enabled: true,
         ),
       );

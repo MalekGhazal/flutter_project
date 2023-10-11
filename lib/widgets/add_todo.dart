@@ -3,9 +3,14 @@
 import 'package:flutter/material.dart';
 
 class AddTodo extends StatefulWidget {
-  final Function(String, String) addTodo;
+  final Function(String, String, DateTime?) addTodo;
+  final DateTime? dueDate;
 
-  const AddTodo({required this.addTodo, Key? key}) : super(key: key);
+  const AddTodo({
+    required this.addTodo,
+    required this.dueDate,
+    Key? key,
+  }) : super(key: key);
 
   @override
   _AddTodoState createState() => _AddTodoState();
@@ -46,8 +51,12 @@ class _AddTodoState extends State<AddTodo> {
               onPressed: () async {
                 final title = titleController.text;
                 final description = descriptionController.text;
+                final dueDate = widget.dueDate; // Get the dueDate from widget
                 widget.addTodo(
-                    title, description); // Call the 'addTodo' function
+                  title,
+                  description,
+                  dueDate,
+                ); // Call the 'addTodo' function
                 Navigator.pop(context);
               },
             ),
