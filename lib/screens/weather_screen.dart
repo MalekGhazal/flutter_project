@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_project/theme/light_theme.dart';
 import 'package:flutter_project/widgets/drawer.dart';
 
 class WeatherScreen extends StatelessWidget {
@@ -7,8 +8,10 @@ class WeatherScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
-        title: const Text('Weather'), // Setting the title of the app bar
+        title: const RedText('Weather Today'),
+        centerTitle: true, // Setting the title of the app bar
       ),
       drawer: const TodoDrawer(), // Adding a drawer to the screen
       body: const Center(

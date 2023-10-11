@@ -170,9 +170,10 @@ class _AddTodoScreenState extends State<AddTodoScreen> {
               const SizedBox(height: 35.0),
               Row(
                 children: [
-                  const Text(
+                  Text(
                     'Due date:',
                     style: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
                       fontSize: 35.0,
                       fontWeight: FontWeight.bold,
                     ),
@@ -184,25 +185,25 @@ class _AddTodoScreenState extends State<AddTodoScreen> {
                       children: [
                         Text(
                           dueDate!.toLocal().toString().split(' ')[0],
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 20,
-                            color: Colors.green,
+                            color: Theme.of(context).colorScheme.primary,
                           ),
                         ),
                       ],
                     ),
-                  const VerticalDivider(
+                  VerticalDivider(
                     width: 5,
-                    color: Colors.transparent,
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                   GestureDetector(
                     onTap: () {
                       selectDueDate(context);
                     },
-                    child: const Icon(
+                    child: Icon(
                       Icons.calendar_month_outlined,
                       size: 45,
-                      color: Colors.blue,
+                      color: Theme.of(context).colorScheme.secondary,
                     ),
                   ),
                 ],
