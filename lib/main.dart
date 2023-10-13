@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_project/login/login_check.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_project/providers/todo_provider.dart';
 import 'package:flutter_project/routes/drawer_routes.dart';
 import 'package:flutter_project/screens/profile_screen.dart';
+import 'package:flutter_project/screens/todos_google_screen.dart';
 import 'package:flutter_project/screens/todos_screen.dart';
 import 'package:flutter_project/screens/weather_screen.dart';
+import 'package:flutter_project/services/authentication.dart';
 import 'package:flutter_project/widgets/drawer.dart';
 import '../theme/dark_theme.dart';
 import '../theme/light_theme.dart';
@@ -36,12 +39,26 @@ void main(List<String> args) async {
   );
 }
 
+bool googleUser = false;
 class TodoApp extends StatelessWidget {
   const TodoApp({super.key});
-
+  
   @override
   Widget build(BuildContext context) {
+    return StreamBuilder<User?>(
+      stream: AuthService().userStream,
+      builder: (context, AsyncSnapshot<User?> snapshot) {
+        if (snapshot.connectionState == ConnectionState.active) {
+          if(AuthService().user?.email != null){
+            googleUser = true;
+          } else{
+            googleUser = false;
+          }
+          
+        }
+      
     return MaterialApp(
+      
       // Disable the debug banner in the top-right corner
       debugShowCheckedModeBanner: false,
 
@@ -55,12 +72,14 @@ class TodoApp extends StatelessWidget {
         "/": (context) => const LoginCheck(),
 
         // Other routes are accessible through the drawer
-        DrawerRoutes.todos: (context) => const TodosScreen(),
+        DrawerRoutes.todos: (context) => (googleUser == true ? const TodosGoogleScreen() : const TodosScreen()),
         DrawerRoutes.weather: (context) => const WeatherScreen(),
         DrawerRoutes.profile: (context) => ProfileScreen(),
       },
     );
   }
+    );
+}
 }
 
 class DrawerScreen extends StatelessWidget {
@@ -73,7 +92,7 @@ class DrawerScreen extends StatelessWidget {
         title: const Text('Your App Name'),
       ),
       // Add the TodoDrawer widget as the drawer for this screen
-      drawer: const TodoDrawer(),
+      drawer: TodoDrawer(),
 
       // Set the body of this screen to the LoginCheck widget
       body: const LoginCheck(),

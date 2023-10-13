@@ -10,7 +10,7 @@ class WeatherScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Weather'), // Setting the title of the app bar
       ),
-      drawer: const TodoDrawer(), // Adding a drawer to the screen
+      drawer: TodoDrawer(), // Adding a drawer to the screen
       body: const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

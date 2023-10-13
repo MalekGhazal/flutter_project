@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_project/services/authentication.dart';
 import 'package:flutter_project/theme/light_theme.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -6,19 +7,25 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../screens/add_todo_screen.dart';
 
 class TodoDrawer extends StatelessWidget {
-  const TodoDrawer({super.key});
+  TodoDrawer({super.key});
 
+  final user = FirebaseAuth.instance.currentUser;
+  final email = FirebaseAuth.instance.currentUser?.email;
+  final name = FirebaseAuth.instance.currentUser?.displayName;
+ 
   @override
   Widget build(BuildContext context) {
     return Drawer(
       backgroundColor: Theme.of(context).colorScheme.primary,
       child: ListView(
         children: <Widget>[
-          const UserAccountsDrawerHeader(
-            accountName: Text("User Name",
-                style: TextStyle(fontWeight: FontWeight.w700)),
-            accountEmail: Text("your.email@example.com"),
-            currentAccountPicture: CircleAvatar(
+          UserAccountsDrawerHeader(
+            accountName: Text(
+              (name != null ? name.toString() : "Anonymous user"),
+                style: const TextStyle(fontWeight: FontWeight.w700)),
+            accountEmail: Text(
+              (email != null ? email.toString() : ""),),
+            currentAccountPicture: const CircleAvatar(
               backgroundColor: Colors.transparent,
               backgroundImage:
                   AssetImage("assets/images/ProfilePlaceholder.png"),
@@ -55,6 +62,7 @@ class TodoDrawer extends StatelessWidget {
             onTap: () {
               Navigator.of(context).pop(); // Close the drawer
               Navigator.of(context).pushReplacementNamed('/profile');
+
             },
           ),
           ListTile(

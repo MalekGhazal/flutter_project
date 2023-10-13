@@ -156,7 +156,7 @@ class TodosState extends State<TodosScreen> {
           ),
         ),
 
-        drawer: const TodoDrawer(), // Adding a drawer to the screen
+        drawer: TodoDrawer(), // Adding a drawer to the screen
         body: TabBarView(
           children: [
             todoList(context, openTodos, toggleOpenTodo, loadMore,

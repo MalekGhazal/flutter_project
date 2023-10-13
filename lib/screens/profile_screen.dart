@@ -5,17 +5,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_project/widgets/drawer.dart';
 import 'package:flutter_project/services/authentication.dart';
 
+///Class to display user data fetched from firebase authentication
 class ProfileScreen extends StatelessWidget {
   ProfileScreen({Key? key}) : super(key: key);
 
   final user = FirebaseAuth.instance.currentUser;
+  final email = FirebaseAuth.instance.currentUser?.email;
+  final name = FirebaseAuth.instance.currentUser?.displayName;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(),
-      drawer: const TodoDrawer(), // Adding a drawer to the screen
+      drawer: TodoDrawer(), // Adding a drawer to the screen
       body: Align(
         alignment: Alignment.topCenter,
         child: Column(
@@ -32,7 +35,7 @@ class ProfileScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16.0),
             Text(
-              'Username',
+              (name != null ? name.toString() : "Anonymous user"),
               style: TextStyle(
                   fontSize: 26.0,
                   fontStyle: FontStyle.italic,
@@ -40,9 +43,9 @@ class ProfileScreen extends StatelessWidget {
                   color: Theme.of(context).colorScheme.primary),
             ),
             const SizedBox(height: 8.0),
-            const Text(
-              'user.email@example.com',
-              style: TextStyle(fontSize: 16.0),
+            Text(
+              (email != null ? email.toString() : ""),
+              style: const TextStyle(fontSize: 16.0),
             ),
             const SizedBox(
               height: 50.0,

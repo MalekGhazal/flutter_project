@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_project/services/firestore.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_project/providers/todo_provider.dart';
 import 'package:flutter_project/widgets/drawer.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
+///Class to handle how a ToDo is added, depending if the user is logged anonymously or with a Google account
 class AddTodoScreen extends StatefulWidget {
   const AddTodoScreen({Key? key}) : super(key: key);
 
@@ -14,6 +17,7 @@ class AddTodoScreen extends StatefulWidget {
 class _AddTodoScreenState extends State<AddTodoScreen> {
   final TextEditingController titleController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
+  final email = FirebaseAuth.instance.currentUser?.email;
 
   void submitTodo() {
     final String title = titleController.text.trim();
@@ -30,6 +34,23 @@ class _AddTodoScreenState extends State<AddTodoScreen> {
       Navigator.pop(context);
     }
   }
+  //Handle a ToDo added by a Google user
+  void submitUserTodo(){
+    final String title = titleController.text.trim();
+    final String description = descriptionController.text.trim();
+    final String user = email.toString();
+    
+    final task = <String, dynamic>{
+      "title" : title,
+      "description": description,
+      "user": user,
+      "dueDate": "12/10/2023",
+      "status": "open"
+    };
+
+    db.collection("tasks").add(task);
+    Navigator.pop(context);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +64,7 @@ class _AddTodoScreenState extends State<AddTodoScreen> {
           },
         ),
       ),
-      drawer: const TodoDrawer(),
+      drawer: TodoDrawer(),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -64,7 +85,10 @@ class _AddTodoScreenState extends State<AddTodoScreen> {
             ),
             const SizedBox(height: 16.0),
             ElevatedButton(
-              onPressed: submitTodo,
+              
+              onPressed: () => 
+              (email != null ? submitUserTodo() :  submitTodo()),
+              
               child: const Text('Submit'),
             ),
           ],
