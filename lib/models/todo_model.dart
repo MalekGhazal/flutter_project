@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 // Define an enum to represent the status of a Todo
 enum TodoStatus {
   open,
@@ -11,12 +9,14 @@ class Todo {
   String? title;
   String? description;
   TodoStatus status;
+  DateTime? dueDate;
 
   // Constructor for creating a Todo
   Todo({
     this.title,
     this.description,
     required this.status,
+    this.dueDate,
   });
 
   // Factory method to create a Todo object from JSON data
@@ -26,6 +26,9 @@ class Todo {
       description: json["description"],
       // Map the "status" field from JSON to the TodoStatus enum
       status: json["status"] == "closed" ? TodoStatus.closed : TodoStatus.open,
+      dueDate: json["dueDate"] != null
+          ? DateTime.parse(json["dueDate"])
+          : null, // Parse dueDate from JSON
     );
   }
 
@@ -36,19 +39,10 @@ class Todo {
       "description": description,
       // Map the TodoStatus enum to a string for JSON
       "status": status == TodoStatus.closed ? "closed" : "open",
+      "dueDate": dueDate != null
+          ? dueDate!.toIso8601String()
+          : null, // Convert dueDate to ISO 8601 string
     };
     return data;
   }
-}
-
-// Convert a JSON string to a list of Todo objects
-List<Todo> todoListFromJson(String str) {
-  final jsonData = json.decode(str);
-  return List<Todo>.from(jsonData.map((x) => Todo.fromJson(x)));
-}
-
-// Convert a list of Todo objects to a JSON string
-String todoListToJson(List<Todo> data) {
-  final List<dynamic> jsonData = data.map((x) => x.toJson()).toList();
-  return json.encode(jsonData);
 }

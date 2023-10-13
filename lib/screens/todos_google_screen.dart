@@ -10,14 +10,13 @@ import 'package:flutter_project/widgets/todo_google_list.dart';
 final email = FirebaseAuth.instance.currentUser?.email;
 
 class TodosGoogleScreen extends StatefulWidget {
-  const TodosGoogleScreen({super.key});
+  const TodosGoogleScreen({Key? key}) : super(key: key);
 
   @override
-  // ignore: library_private_types_in_public_api
-  _TodosGoogleScreen createState() => _TodosGoogleScreen();
+    TodosGoogleState createState() => TodosGoogleState();
 }
 
-class _TodosGoogleScreen extends State<TodosGoogleScreen> {
+class TodosGoogleState extends State<TodosGoogleScreen> {
   bool loading = false; // Indicates whether data is loading
   String activeTab = 'open';
 
@@ -73,8 +72,8 @@ class _TodosGoogleScreen extends State<TodosGoogleScreen> {
                   drawer: TodoDrawer(), // Adding a drawer to the screen
                   body: TabBarView(
                     children: [
-                      todoGoogleList(snapshot1),
-                      todoGoogleList(snapshot2)
+                      todoGoogleList(snapshot1, context),
+                      todoGoogleList(snapshot2, context)
                     ],
                   ),
                   floatingActionButton: FloatingActionButton.extended(

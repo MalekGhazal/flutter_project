@@ -115,11 +115,12 @@ class TodosState extends State<TodosScreen> {
       context: context,
       builder: (BuildContext context) {
         return AddTodo(
-          addTodo: (String title, String description) {
+          addTodo: (String title, String description, DateTime? dueDate) {
             // Call the addTodo method with the provided description.
             Provider.of<TodoProvider>(context, listen: false)
-                .addTodo(title, description);
+                .addTodo(title, description, dueDate);
           },
+          dueDate: null,
         );
       },
     );
