@@ -1,27 +1,38 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
+import 'package:flutter_project/services/firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_project/theme/light_theme.dart';
+import 'package:flutter_project/widgets/drawer.dart';
+import 'package:flutter_project/screens/add_todo_screen.dart';
+import 'package:flutter_project/widgets/todo_google_list.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_project/models/todo_model.dart';
 import 'package:flutter_project/providers/todo_provider.dart';
 import 'package:flutter_project/widgets/add_todo.dart';
-import 'package:flutter_project/widgets/drawer.dart';
 import 'package:flutter_project/widgets/todo_list.dart';
-import 'package:flutter_project/screens/add_todo_screen.dart';
+
+enum TodoDataSource { local, google }
 
 class TodosScreen extends StatefulWidget {
-  const TodosScreen({Key? key}) : super(key: key);
+  final TodoDataSource dataSource;
+
+  const TodosScreen({Key? key, this.dataSource = TodoDataSource.local})
+      : super(key: key);
 
   @override
-  TodosState createState() => TodosState();
+  _TodosScreenState createState() => _TodosScreenState();
 }
 
-class TodosState extends State<TodosScreen> {
-  bool loading = false; // Indicates whether data is loading
-  String activeTab = 'open'; // Tracks the active tab (open or closed)
+class _TodosScreenState extends State<TodosScreen> {
+  String activeTab = 'open';
+  String? email;
+  Stream<QuerySnapshot>? _openTasksStream;
+  Stream<QuerySnapshot>? _closedTasksStream;
+  bool loading = false;
 
-  // Function to toggle the status of an open todo
   Future<void> toggleOpenTodo(Todo todo) async {
     // Determine the status change
     TodoStatus statusModified =
@@ -58,7 +69,6 @@ class TodosState extends State<TodosScreen> {
     );
   }
 
-  // Function to toggle the status of a closed todo
   Future<void> toggleClosedTodo(Todo todo) async {
     TodoStatus statusModified =
         todo.status == TodoStatus.open ? TodoStatus.closed : TodoStatus.open;
@@ -87,7 +97,6 @@ class TodosState extends State<TodosScreen> {
     );
   }
 
-  // Function to load more todo items
   void loadMore() async {
     // If we're already loading return early.
     if (loading) {
@@ -109,7 +118,6 @@ class TodosState extends State<TodosScreen> {
     }
   }
 
-  // Function to show the add task sheet
   void showAddTaskSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -127,10 +135,51 @@ class TodosState extends State<TodosScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    final openTodos = Provider.of<TodoProvider>(context).openTodos;
-    final closedTodos = Provider.of<TodoProvider>(context).closedTodos;
+  void initState() {
+    super.initState();
+    if (widget.dataSource == TodoDataSource.google) {
+      email = FirebaseAuth.instance.currentUser?.email;
+      _openTasksStream = db
+          .collection('tasks')
+          .where("status", isEqualTo: "open")
+          .where("user", isEqualTo: email)
+          .snapshots();
+      _closedTasksStream = db
+          .collection('tasks')
+          .where("status", isEqualTo: "closed")
+          .where("user", isEqualTo: email)
+          .snapshots();
+    }
+  }
 
+  @override
+  Widget build(BuildContext context) {
+    if (widget.dataSource == TodoDataSource.google) {
+      return StreamBuilder<QuerySnapshot>(
+        stream: _openTasksStream,
+        builder:
+            (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot1) {
+          return StreamBuilder<QuerySnapshot>(
+            stream: _closedTasksStream,
+            builder: (context, AsyncSnapshot<QuerySnapshot> snapshot2) {
+              if (snapshot1.connectionState == ConnectionState.waiting ||
+                  snapshot2.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              return _buildUI(context, snapshot1, snapshot2);
+            },
+          );
+        },
+      );
+    } else {
+      final openTodos = Provider.of<TodoProvider>(context).openTodos;
+      final closedTodos = Provider.of<TodoProvider>(context).closedTodos;
+      return _buildUI(context, openTodos, closedTodos);
+    }
+  }
+
+  Widget _buildUI(
+      BuildContext context, dynamic openTodosData, dynamic closedTodosData) {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
@@ -140,7 +189,6 @@ class TodosState extends State<TodosScreen> {
           centerTitle: true,
           bottom: TabBar(
             labelColor: Theme.of(context).colorScheme.primary,
-            // Add the TabBar widget for switching tabs
             tabs: const [
               Tab(text: 'Open'),
               Tab(text: 'Closed'),
@@ -156,22 +204,24 @@ class TodosState extends State<TodosScreen> {
                 const TextStyle(fontWeight: FontWeight.normal, fontSize: 16.0),
           ),
         ),
-
-        drawer: TodoDrawer(), // Adding a drawer to the screen
+        drawer: TodoDrawer(),
         body: TabBarView(
           children: [
-            todoList(context, openTodos, toggleOpenTodo, loadMore,
-                TodoStatus.open), // Displaying the list of open todos
-            todoList(context, closedTodos, toggleClosedTodo, loadMore,
-                TodoStatus.closed), // Displaying the list of closed todos
+            widget.dataSource == TodoDataSource.local
+                ? todoList(context, openTodosData, toggleOpenTodo, loadMore,
+                    TodoStatus.open)
+                : todoGoogleList(openTodosData, context),
+            widget.dataSource == TodoDataSource.local
+                ? todoList(context, closedTodosData, toggleClosedTodo, loadMore,
+                    TodoStatus.closed)
+                : todoGoogleList(closedTodosData, context),
           ],
         ),
         floatingActionButton: FloatingActionButton.extended(
           onPressed: () {
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (context) =>
-                    const AddTodoScreen(), // Navigating to the AddTodoScreen
+                builder: (context) => const AddTodoScreen(),
               ),
             );
           },

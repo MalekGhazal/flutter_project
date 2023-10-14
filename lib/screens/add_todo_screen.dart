@@ -1,4 +1,4 @@
-// ignore_for_file: library_private_types_in_public_api
+// ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
 import 'package:flutter_project/services/firestore.dart';
@@ -38,8 +38,7 @@ class _AddTodoScreenState extends State<AddTodoScreen> {
     }
   }
 
-  //Function to submit a new ToDo for an anonymous user
-  void submitTodo() {
+  void validateAndSubmitTodo() {
     if (titleController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -67,48 +66,34 @@ class _AddTodoScreenState extends State<AddTodoScreen> {
       return;
     }
 
+    if (email != null) {
+      _submitUserTodoToFirestore();
+    } else {
+      _submitAnonymousTodoLocally();
+    }
+  }
+
+  void _submitAnonymousTodoLocally() {
     Provider.of<TodoProvider>(context, listen: false).addTodo(
       titleController.text.trim(),
       descriptionController.text.trim(),
       dueDate,
     );
 
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Todo added successfully.'),
+      ),
+    );
+
     Navigator.pop(context);
   }
 
-  //Function to submit a new ToDo for a Google user
-  void submitUserTodo() {
+  Future<void> _submitUserTodoToFirestore() async {
     final String title = titleController.text.trim();
     final String description = descriptionController.text.trim();
     final String user = email.toString();
     final String? due = dueDate?.toLocal().toString().split(' ')[0];
-
-    if (titleController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please enter a title.'),
-        ),
-      );
-      return;
-    }
-
-    if (descriptionController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please enter a description.'),
-        ),
-      );
-      return;
-    }
-
-    if (dueDate == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please select a due date.'),
-        ),
-      );
-      return;
-    }
 
     final task = <String, dynamic>{
       "title": title,
@@ -118,8 +103,21 @@ class _AddTodoScreenState extends State<AddTodoScreen> {
       "status": "open"
     };
 
-    db.collection("tasks").add(task);
-    Navigator.pop(context);
+    try {
+      await db.collection("tasks").add(task);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Todo added successfully.'),
+        ),
+      );
+      Navigator.pop(context);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Error adding todo. Please try again.'),
+        ),
+      );
+    }
   }
 
   @override
@@ -177,6 +175,7 @@ class _AddTodoScreenState extends State<AddTodoScreen> {
                     borderRadius: BorderRadius.circular(12.0),
                   ),
                 ),
+                cursorColor: Theme.of(context).colorScheme.secondary,
               ),
               const SizedBox(height: 16.0),
 
@@ -217,6 +216,7 @@ class _AddTodoScreenState extends State<AddTodoScreen> {
                       borderRadius: BorderRadius.circular(12.0),
                     ),
                   ),
+                  cursorColor: Theme.of(context).colorScheme.secondary,
                 ),
               ),
               const SizedBox(height: 35.0),
@@ -268,8 +268,7 @@ class _AddTodoScreenState extends State<AddTodoScreen> {
                 child: SizedBox(
                   width: 150.0,
                   child: ElevatedButton(
-                    onPressed: () =>
-                        (email != null ? submitUserTodo() : submitTodo()),
+                    onPressed: validateAndSubmitTodo,
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all<Color>(
                         Theme.of(context).colorScheme.secondary,

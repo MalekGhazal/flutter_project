@@ -5,7 +5,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_project/providers/todo_provider.dart';
 import 'package:flutter_project/routes/drawer_routes.dart';
 import 'package:flutter_project/screens/profile_screen.dart';
-import 'package:flutter_project/screens/todos_google_screen.dart';
 import 'package:flutter_project/screens/todos_screen.dart';
 import 'package:flutter_project/screens/weather_screen.dart';
 import 'package:flutter_project/services/authentication.dart';
@@ -40,46 +39,47 @@ void main(List<String> args) async {
 }
 
 bool googleUser = false;
+
 class TodoApp extends StatelessWidget {
   const TodoApp({super.key});
-  
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<User?>(
-      stream: AuthService().userStream,
-      builder: (context, AsyncSnapshot<User?> snapshot) {
-        if (snapshot.connectionState == ConnectionState.active) {
-          if(AuthService().user?.email != null){
-            googleUser = true;
-          } else{
-            googleUser = false;
+        stream: AuthService().userStream,
+        builder: (context, AsyncSnapshot<User?> snapshot) {
+          if (snapshot.connectionState == ConnectionState.active) {
+            if (AuthService().user?.email != null) {
+              googleUser = true;
+            } else {
+              googleUser = false;
+            }
           }
-          
-        }
-      
-    return MaterialApp(
-      
-      // Disable the debug banner in the top-right corner
-      debugShowCheckedModeBanner: false,
 
-      // Define the light and dark themes for the app
-      theme: lightTheme,
-      darkTheme: darkTheme,
+          return MaterialApp(
+            // Disable the debug banner in the top-right corner
+            debugShowCheckedModeBanner: false,
 
-      // Define the app's routes for different screens
-      routes: {
-        // The default route ("/") leads to the LoginCheck screen
-        "/": (context) => const LoginCheck(),
+            // Define the light and dark themes for the app
+            theme: lightTheme,
+            darkTheme: darkTheme,
 
-        // Other routes are accessible through the drawer
-        DrawerRoutes.todos: (context) => (googleUser == true ? const TodosGoogleScreen() : const TodosScreen()),
-        DrawerRoutes.weather: (context) => const WeatherScreen(),
-        DrawerRoutes.profile: (context) => ProfileScreen(),
-      },
-    );
+            // Define the app's routes for different screens
+            routes: {
+              // The default route ("/") leads to the LoginCheck screen
+              "/": (context) => const LoginCheck(),
+
+              // Other routes are accessible through the drawer
+              DrawerRoutes.todos: (context) => TodosScreen(
+                  dataSource: (googleUser == true
+                      ? TodoDataSource.google
+                      : TodoDataSource.local)),
+              DrawerRoutes.weather: (context) => const WeatherScreen(),
+              DrawerRoutes.profile: (context) => ProfileScreen(),
+            },
+          );
+        });
   }
-    );
-}
 }
 
 class DrawerScreen extends StatelessWidget {

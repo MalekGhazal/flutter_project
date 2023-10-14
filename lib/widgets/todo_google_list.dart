@@ -1,6 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
+void updateTodoStatus(DocumentReference reference, String newStatus) async {
+  await reference.update({
+    "status": newStatus,
+  });
+}
+
 Widget todoGoogleList(AsyncSnapshot snapshot, BuildContext context) {
   Icon icon;
 
@@ -35,7 +41,11 @@ Widget todoGoogleList(AsyncSnapshot snapshot, BuildContext context) {
             ),
             child: ListTile(
               leading: GestureDetector(
-                onTap: () {},
+                onTap: () {
+                  String newStatus =
+                      data['status'] == "open" ? "closed" : "open";
+                  updateTodoStatus(document.reference, newStatus);
+                },
                 child: icon,
               ),
               title: Text(
