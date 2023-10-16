@@ -1,34 +1,43 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_project/providers/profile_picture.dart';
 import 'package:flutter_project/services/authentication.dart';
 import 'package:flutter_project/theme/light_theme.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
 
 import '../screens/add_todo_screen.dart';
 
 class TodoDrawer extends StatelessWidget {
-  TodoDrawer({super.key});
+  TodoDrawer({Key? key, this.userImage}) : super(key: key);
+
+  final File? userImage;
 
   final user = FirebaseAuth.instance.currentUser;
   final email = FirebaseAuth.instance.currentUser?.email;
   final name = FirebaseAuth.instance.currentUser?.displayName;
- 
+
   @override
   Widget build(BuildContext context) {
+    File? image = Provider.of<ProfilePicture>(context).userImage;
+
     return Drawer(
       backgroundColor: Theme.of(context).colorScheme.primary,
       child: ListView(
         children: <Widget>[
           UserAccountsDrawerHeader(
             accountName: Text(
-              (name != null ? name.toString() : "Anonymous user"),
+                (name != null ? name.toString() : "Anonymous user"),
                 style: const TextStyle(fontWeight: FontWeight.w700)),
             accountEmail: Text(
-              (email != null ? email.toString() : ""),),
-            currentAccountPicture: const CircleAvatar(
+              (email != null ? email.toString() : ""),
+            ),
+            currentAccountPicture: CircleAvatar(
               backgroundColor: Colors.transparent,
-              backgroundImage:
-                  AssetImage("assets/images/ProfilePlaceholder.png"),
+              backgroundImage: image != null
+                  ? FileImage(image) as ImageProvider<Object>
+                  : const AssetImage("assets/images/ProfilePlaceholder.png"),
             ),
           ),
           ListTile(
@@ -62,7 +71,6 @@ class TodoDrawer extends StatelessWidget {
             onTap: () {
               Navigator.of(context).pop(); // Close the drawer
               Navigator.of(context).pushReplacementNamed('/profile');
-
             },
           ),
           ListTile(

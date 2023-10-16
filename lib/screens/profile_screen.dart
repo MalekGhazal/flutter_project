@@ -1,20 +1,48 @@
 // ignore_for_file: use_build_context_synchronously
-
+import 'package:flutter/services.dart';
+import 'package:flutter_project/providers/profile_picture.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_project/widgets/drawer.dart';
 import 'package:flutter_project/services/authentication.dart';
+import 'package:provider/provider.dart';
 
 ///Class to display user data fetched from firebase authentication
-class ProfileScreen extends StatelessWidget {
-  ProfileScreen({Key? key}) : super(key: key);
+class ProfileScreen extends StatefulWidget {
+  const ProfileScreen({Key? key}) : super(key: key);
 
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
   final user = FirebaseAuth.instance.currentUser;
   final email = FirebaseAuth.instance.currentUser?.email;
   final name = FirebaseAuth.instance.currentUser?.displayName;
 
+  File? _image;
+
+  Future _pickImage(ImageSource source) async {
+    try {
+      final image = await ImagePicker().pickImage(source: source);
+      if (image == null) return;
+      File? img = File(image.path);
+      setState(() {
+        _image = img;
+      });
+      Provider.of<ProfilePicture>(context, listen: false).setImage(img);
+    } on PlatformException catch (e) {
+      print(e);
+      Navigator.of(context).pop();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    File? image = Provider.of<ProfilePicture>(context).userImage;
+
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(),
@@ -24,13 +52,15 @@ class ProfileScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
-            const Padding(
-              padding: EdgeInsets.only(top: 20.0),
+            Padding(
+              padding: const EdgeInsets.only(top: 20.0),
               child: CircleAvatar(
                 radius: 80.0,
                 backgroundColor: Colors.transparent,
-                backgroundImage: AssetImage(
-                    'assets/images/ProfilePlaceholder.png'), // Displaying placeholder profile image
+                backgroundImage: image != null
+                    ? FileImage(image) as ImageProvider<Object>
+                    : const AssetImage(
+                        "assets/images/ProfilePlaceholder.png"), // Displaying placeholder profile image
               ),
             ),
             const SizedBox(height: 16.0),
@@ -66,6 +96,34 @@ class ProfileScreen extends StatelessWidget {
                     color: Theme.of(context).colorScheme.primary,
                     fontSize: 20,
                     fontWeight: FontWeight.w400)),
+            const SizedBox(
+              height: 50.0,
+            ),
+            ElevatedButton(
+              onPressed: () {
+                _pickImage(ImageSource.camera);
+              },
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all<Color>(
+                  Theme.of(context).colorScheme.primary,
+                ),
+                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30.0),
+                  ),
+                ),
+                padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+                  const EdgeInsets.symmetric(horizontal: 35, vertical: 10),
+                ),
+              ),
+              child: Text(
+                "Upload Photo",
+                style: TextStyle(
+                    color: Theme.of(context).colorScheme.background,
+                    fontSize: 20.0,
+                    fontWeight: FontWeight.w600),
+              ),
+            ),
             const SizedBox(
               height: 50.0,
             ),

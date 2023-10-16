@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_project/login/login_check.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_project/providers/profile_picture.dart';
 import 'package:flutter_project/providers/todo_provider.dart';
 import 'package:flutter_project/routes/drawer_routes.dart';
 import 'package:flutter_project/screens/profile_screen.dart';
@@ -31,6 +32,7 @@ void main(List<String> args) async {
         ChangeNotifierProvider<TodoProvider>(
           create: (_) => TodoProvider(),
         ),
+        ChangeNotifierProvider<ProfilePicture>(create: (_) => ProfilePicture())
       ],
       // Start the app by calling the TodoApp widget
       child: const TodoApp(),
