@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_project/models/todo_model.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_project/providers/todo_provider.dart';
+import 'package:provider/provider.dart';
 
 Widget todoList(
   BuildContext context,
@@ -19,6 +21,37 @@ Widget todoList(
   });
 
   final filteredTodos = todos.where((todo) => todo.status == status).toList();
+
+  void deleteTodo(Todo todo) {
+    Provider.of<TodoProvider>(context, listen: false).deleteTodo(todo);
+  }
+
+  Future<void> confirmDelete(Todo todo) async {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirm Delete'),
+          content: const Text('Are you sure you want to delete this task?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Delete'),
+              onPressed: () {
+                deleteTodo(todo); // Call the deleteTodo function
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   return ListView.separated(
     controller: scrollController,
@@ -95,13 +128,22 @@ Widget todoList(
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.edit,
-                        color: Theme.of(context).colorScheme.background,
-                        size: 25.0),
+                    Icon(
+                      Icons.edit,
+                      color: Theme.of(context).colorScheme.background,
+                      size: 25.0,
+                    ),
                     const SizedBox(width: 20.0),
-                    Icon(Icons.delete,
+                    GestureDetector(
+                      onTap: () {
+                        confirmDelete(todo); // Call the confirmDelete function
+                      },
+                      child: Icon(
+                        Icons.delete,
                         color: Theme.of(context).colorScheme.secondary,
-                        size: 25.0),
+                        size: 25.0,
+                      ),
+                    ),
                   ],
                 ),
               ],
