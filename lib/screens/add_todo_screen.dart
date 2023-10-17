@@ -8,7 +8,35 @@ import 'package:flutter_project/providers/todo_provider.dart';
 import 'package:flutter_project/widgets/drawer.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-///Class to handle how a ToDo is added, depending if the user is logged anonymously or with a Google account
+/// `AddTodoScreen` is a stateful widget that provides an interface to add a new todo item.
+///
+/// Users can input the title, description, and select a due date for their todo. The widget offers
+/// validation for each input, ensuring that they are not empty before submission. Upon successful
+/// validation, the todo is either added to Firestore (for authenticated users with a Google account)
+/// or stored locally (for anonymous users).
+///
+/// Key Functionalities:
+/// 1. Input for todo's title and description.
+/// 2. Date picker to select the todo's due date.
+/// 3. Validation to ensure every input field is filled.
+/// 4. Data submission to Firestore for authenticated users or local storage for anonymous users.
+/// 5. Feedback to the user upon successful addition or error through snack bars.
+///
+/// Dependencies:
+/// - `firestore.dart`: Service to interact with Firestore.
+/// - `light_theme.dart`: For the app's light theme colors and styles.
+/// - `todo_provider.dart`: Provider for CRUD operations on todos.
+/// - `drawer.dart`: Represents the drawer widget used in this screen.
+/// - `firebase_auth.dart`: Firebase authentication package.
+///
+/// Usage:
+/// ```dart
+/// AddTodoScreen()
+/// ```
+///
+/// This widget enhances the user experience by ensuring data integrity and providing feedback, making
+/// the todo addition process seamless.
+
 class AddTodoScreen extends StatefulWidget {
   const AddTodoScreen({Key? key}) : super(key: key);
 

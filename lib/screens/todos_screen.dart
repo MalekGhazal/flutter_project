@@ -16,6 +16,38 @@ import 'package:flutter_project/widgets/todo_list.dart';
 
 enum TodoDataSource { local, google }
 
+/// `TodosScreen` is a stateful widget that displays a list of todos, categorized as 'Open' or 'Closed'.
+///
+/// The screen provides two tabs: 'Open' and 'Closed' which show the respective list of tasks.
+/// Users can toggle the status of a todo by tapping on it. They can also add new todos using the
+/// floating action button at the bottom.
+///
+/// The todos can be sourced from either a local storage or Google Firestore, which is determined by the
+/// `dataSource` parameter. If sourced from Firestore, the tasks are associated with the email of the
+/// currently authenticated user.
+///
+/// Usage:
+/// ```dart
+/// TodosScreen(dataSource: TodoDataSource.local)
+/// ```
+/// or
+/// ```dart
+/// TodosScreen(dataSource: TodoDataSource.google)
+/// ```
+///
+/// Dependencies:
+/// - `light_theme.dart`: For the app's light theme colors and styles.
+/// - `drawer.dart`: Represents the drawer widget used in this screen.
+/// - `add_todo_screen.dart`: Screen to add a new todo.
+/// - `todo_google_list.dart`: Widget to display the todos from Google Firestore (Google sign in).
+/// - `todo_model.dart`: Defines the structure of a todo item.
+/// - `todo_provider.dart`: Provider for CRUD operations on todos.
+/// - `add_todo.dart`: Widget to display the bottom sheet for adding a todo.
+/// - `todo_list.dart`: Widget to display the list of todos (Anonymous Login).
+///
+/// Enums:
+/// - `TodoDataSource`: Determines the source of the todos. Can be either `local` (Anonymous Login) or `google`.
+
 class TodosScreen extends StatefulWidget {
   final TodoDataSource dataSource;
 
