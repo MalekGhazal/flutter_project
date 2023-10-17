@@ -45,15 +45,12 @@ class TodoProvider with ChangeNotifier {
   List<Todo> get closedTodos => _closedTodos;
 
   Future<bool> toggleTodoStatus(Todo todo, TodoStatus statusModified) async {
-    // Check if the task is already in the desired status, if yes, do nothing.
     if (todo.status == statusModified) {
       return false;
     }
 
-    // Update the task status.
     todo.status = statusModified;
 
-    // Move the task between open and closed lists.
     if (statusModified == TodoStatus.closed) {
       _openTodos.remove(todo);
       _closedTodos.add(todo);
@@ -67,15 +64,15 @@ class TodoProvider with ChangeNotifier {
   }
 
   Future<void> loadMore(String activeTab) async {
-    // Simulate loading more data.
     await Future.delayed(const Duration(seconds: 1));
-
     notifyListeners();
   }
 
   Future<void> addTodo(
-      String title, String description, DateTime? dueDate) async {
-    // Simulate adding a new todo.
+    String title,
+    String description,
+    DateTime? dueDate,
+  ) async {
     Todo todo = Todo(
       title: title,
       description: description,
@@ -86,8 +83,26 @@ class TodoProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> editTodo(
+    Todo todo,
+    String newTitle,
+    String newDescription,
+    DateTime? newDueDate,
+  ) async {
+    if (todo.title == newTitle &&
+        todo.description == newDescription &&
+        todo.dueDate == newDueDate) {
+      return;
+    }
+
+    todo.title = newTitle;
+    todo.description = newDescription;
+    todo.dueDate = newDueDate;
+
+    notifyListeners();
+  }
+
   Future<void> deleteTodo(Todo todo) async {
-    // Remove the todo from the appropriate list (open or closed).
     if (todo.status == TodoStatus.open) {
       _openTodos.remove(todo);
     } else {
