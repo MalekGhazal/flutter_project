@@ -85,4 +85,14 @@ class TodoProvider with ChangeNotifier {
     _openTodos.insert(0, todo);
     notifyListeners();
   }
+
+  Future<void> deleteTodo(Todo todo) async {
+    // Remove the todo from the appropriate list (open or closed).
+    if (todo.status == TodoStatus.open) {
+      _openTodos.remove(todo);
+    } else {
+      _closedTodos.remove(todo);
+    }
+    notifyListeners();
+  }
 }
