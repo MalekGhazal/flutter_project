@@ -4,7 +4,7 @@ import 'package:flutter_project/models/todo_model.dart';
 /// `TodoProvider` is a state management class using the `ChangeNotifier` mixin from Flutter's Provider package.
 ///
 /// The class manages a list of todos, separating them into two categories: open and closed. It provides methods
-/// to add, modify, and simulate the loading of todos.
+/// to add, modify, delete, toggle the status of, and simulate the loading of todos.
 ///
 /// Attributes:
 /// - `_initialized`: A flag indicating whether the provider has been initialized.
@@ -15,6 +15,8 @@ import 'package:flutter_project/models/todo_model.dart';
 /// - `toggleTodoStatus`: Allows toggling the status of a todo between open and closed.
 /// - `loadMore`: Simulates the loading of more todos (for pagination or infinite scroll scenarios).
 /// - `addTodo`: Adds a new todo to the list of open todos.
+/// - `editTodo`: Edits the details of an existing todo.
+/// - `deleteTodo`: Removes a todo from the list.
 ///
 /// Usage:
 /// ```dart
