@@ -20,7 +20,8 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   final user = FirebaseAuth.instance.currentUser;
   final email = FirebaseAuth.instance.currentUser?.email;
-  final name = FirebaseAuth.instance.currentUser?.displayName;
+  var name = FirebaseAuth.instance.currentUser?.displayName;
+  late TextEditingController usernameController = TextEditingController();
 
   File? _image;
 
@@ -39,11 +40,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  Future <String?>openDialog() => showDialog<String>(
+    context: context,
+     builder: (context) => AlertDialog(
+      title: const Text('New Username'),
+      content: TextField(
+        autofocus: true,
+        decoration: const InputDecoration(hintText: 'Enter your username'),
+        controller: usernameController,
+      ),
+        
+      actions: [
+        TextButton(
+          onPressed: submit,
+          child: const Text('SUBMIT'))
+      ],
+     ));
+  void submit() {
+    Navigator.of(context).pop(usernameController.text);
+  }
+
+
   @override
   Widget build(BuildContext context) {
     File? image = Provider.of<ProfilePicture>(context).userImage;
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(),
       drawer: TodoDrawer(), // Adding a drawer to the screen
@@ -125,7 +148,39 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
             const SizedBox(
-              height: 50.0,
+              height: 40.0,
+            ),
+            name != null ? 
+              ElevatedButton(onPressed: () async {
+                final username = await openDialog();
+                if(username == null || username.isEmpty) return;
+                FirebaseAuth.instance.currentUser?.updateDisplayName(username);
+                setState(() {
+                  name = username;
+                });
+             }, style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all<Color>(
+                  Theme.of(context).colorScheme.primary,
+                ),
+                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30.0),
+                  ),
+                ),
+                padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+                  const EdgeInsets.symmetric(horizontal: 35, vertical: 10),
+                ),
+              ),
+              child: Text(
+                "Update username",
+                style: TextStyle(
+                    color: Theme.of(context).colorScheme.background,
+                    fontSize: 20.0,
+                    fontWeight: FontWeight.w600),
+              ),
+            )  : Container(),
+            const SizedBox(
+              height: 40.0,
             ),
             ElevatedButton(
               onPressed: () async {
@@ -158,5 +213,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose(){
+    usernameController.dispose();
+    super.dispose();
   }
 }
