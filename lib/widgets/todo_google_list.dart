@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_project/services/firestore.dart';
 
 void updateTodoStatus(DocumentReference reference, String newStatus) async {
   await reference.update({
@@ -9,6 +10,45 @@ void updateTodoStatus(DocumentReference reference, String newStatus) async {
 
 Widget todoGoogleList(AsyncSnapshot snapshot, BuildContext context) {
   Icon icon;
+
+  Future deleteTask(id) async {
+  db.collection('tasks').doc(id).delete(); 
+}
+
+  Future<void> confirmDelete(id) async {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Row(
+            children: [
+              Text(
+                'Confirm Delete',
+                style: TextStyle(
+                    fontWeight: FontWeight.bold, color: Color(0xFFBD5F5F)),
+              ),
+            ],
+          ),
+          content: const Text('Are you sure you want to delete this task?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Delete'),
+              onPressed: () {
+                deleteTask(id);// Call the deleteTodo function
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   return Material(
       color: Theme.of(context).colorScheme.background,
@@ -86,9 +126,17 @@ Widget todoGoogleList(AsyncSnapshot snapshot, BuildContext context) {
                               color: Theme.of(context).colorScheme.background,
                               size: 25.0),
                           const SizedBox(width: 20.0),
-                          Icon(Icons.delete,
+                          GestureDetector(
+                            onTap: () {
+                              String taskId = data['id'];
+                              confirmDelete(taskId); // Call the confirmDelete function
+                            },
+                            child: Icon(
+                              Icons.delete,
                               color: Theme.of(context).colorScheme.secondary,
-                              size: 25.0),
+                              size: 25.0,
+                            ),
+                          ),
                         ],
                       ),
                     ],

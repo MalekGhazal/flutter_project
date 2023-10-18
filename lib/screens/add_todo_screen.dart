@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_project/providers/todo_provider.dart';
 import 'package:flutter_project/widgets/drawer.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 /// `AddTodoScreen` is a stateful widget that provides an interface to add a new todo item.
 ///
@@ -122,7 +123,7 @@ class _AddTodoScreenState extends State<AddTodoScreen> {
     final String description = descriptionController.text.trim();
     final String user = email.toString();
     final String? due = dueDate?.toLocal().toString().split(' ')[0];
-
+    
     final task = <String, dynamic>{
       "title": title,
       "description": description,
@@ -132,7 +133,11 @@ class _AddTodoScreenState extends State<AddTodoScreen> {
     };
 
     try {
-      await db.collection("tasks").add(task);
+      DocumentReference docRef = await db.collection('tasks').add(task);
+      String taskId = docRef.id;
+      await FirebaseFirestore.instance.collection('tasks').doc(taskId).update(
+        {'id': taskId},
+      );
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Todo added successfully.'),

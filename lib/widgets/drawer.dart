@@ -16,11 +16,11 @@ class TodoDrawer extends StatelessWidget {
 
   final user = FirebaseAuth.instance.currentUser;
   final email = FirebaseAuth.instance.currentUser?.email;
-  final name = FirebaseAuth.instance.currentUser?.displayName;
-
+  
   @override
   Widget build(BuildContext context) {
     File? image = Provider.of<ProfilePicture>(context).userImage;
+    final name = FirebaseAuth.instance.currentUser?.displayName;
 
     return Drawer(
       backgroundColor: Theme.of(context).colorScheme.primary,
