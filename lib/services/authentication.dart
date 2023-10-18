@@ -1,6 +1,31 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
+/// `AuthService` is a class responsible for handling user authentication through Firebase.
+///
+/// This service provides methods for anonymous login, Google login, and sign-out. It also offers
+/// access to the current user's authentication state and details.
+///
+/// Key Functionalities:
+/// 1. Monitor user authentication state changes with `userStream`.
+/// 2. Retrieve the current logged-in user's details with `user`.
+/// 3. Sign in anonymously with `anonymousLogin`.
+/// 4. Sign in using Google with `googleLogin`.
+/// 5. Sign out the user with `signOut`.
+///
+/// Dependencies:
+/// - `firebase_auth.dart`: Firebase authentication package.
+/// - `google_sign_in.dart`: Google Sign-In package.
+///
+/// Example:
+/// ```dart
+/// AuthService authService = AuthService();
+/// await authService.googleLogin(); // This will trigger Google Sign-In
+/// ```
+///
+/// Errors during the authentication processes are caught and logged to the console, ensuring that
+/// the app doesn't crash due to authentication issues.
+
 class AuthService {
   final userStream = FirebaseAuth.instance
       .authStateChanges(); // Stream for monitoring user authentication state changes

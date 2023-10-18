@@ -4,6 +4,35 @@ enum TodoStatus {
   closed,
 }
 
+/// Represents a single todo item.
+///
+/// Each todo has a title, description, status, and due date. The `Todo` class provides
+/// methods to serialize from and to JSON format, which can be useful for storing the data or
+/// communicating with an API.
+///
+/// Attributes:
+/// - `title`: Title of the todo.
+/// - `description`: Description or details about the todo.
+/// - `status`: Indicates whether the todo is open or closed.
+/// - `dueDate`: Specifies when the todo is due.
+///
+/// Usage:
+/// ```dart
+/// Todo newTodo = Todo(
+///   title: "Finish homework",
+///   description: "Math homework chapter 5",
+///   status: TodoStatus.open,
+///   dueDate: DateTime.now().add(Duration(days: 2)),
+/// );
+/// String title = newTodo.title;  // Access the title of the todo
+/// TodoStatus status = newTodo.status;  // Access the status of the todo
+/// ```
+/// For serialization and deserialization:
+/// ```dart
+/// Map<String, dynamic> json = newTodo.toJson();  // Serialize to JSON
+/// Todo todoFromJson = Todo.fromJson(json);  // Deserialize from JSON
+/// ```
+
 // Define a class to represent a Todo item
 class Todo {
   String? title;

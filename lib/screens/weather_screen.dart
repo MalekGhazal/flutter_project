@@ -4,6 +4,29 @@ import 'package:flutter_project/widgets/drawer.dart';
 import '../models/weather_model.dart';
 import '../services/weather_service.dart';
 
+/// `WeatherScreen` is a stateful widget that displays the current weather information for a specific city.
+///
+/// This screen provides a text field for users to input a city name and retrieve its weather details.
+/// The fetched data includes temperature, humidity, wind speed, and "feels like" temperature.
+///
+/// Users can search for the weather of a different city by entering the city's name in the provided text field
+/// and tapping the search icon. The results are fetched from the `WeatherApiClient`.
+///
+/// The widget makes use of the app's theme colors for background, text, and icons. It also utilizes the
+/// `FutureBuilder` widget to handle the asynchronous nature of the API call, displaying a loading spinner
+/// while the data is being fetched.
+///
+/// Usage:
+/// ```dart
+/// WeatherScreen()
+/// ```
+///
+/// Dependencies:
+/// - `light_theme.dart`: For the app's light theme colors and styles.
+/// - `drawer.dart`: Represents the drawer widget used in this screen.
+/// - `weather_model.dart`: Defines the structure of the weather data.
+/// - `weather_service.dart`: Contains the API client used for fetching weather data.
+
 class WeatherScreen extends StatefulWidget {
   const WeatherScreen({Key? key}) : super(key: key);
 

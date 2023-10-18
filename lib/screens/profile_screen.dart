@@ -9,7 +9,33 @@ import 'package:flutter_project/widgets/drawer.dart';
 import 'package:flutter_project/services/authentication.dart';
 import 'package:provider/provider.dart';
 
-///Class to display user data fetched from firebase authentication
+/// `ProfileScreen` is a stateful widget that displays user profile information fetched from Firebase Authentication.
+///
+/// This widget allows users to:
+/// 1. View their profile picture, which can be updated from the device's camera.
+/// 2. View their name and email.
+/// 3. View the date they joined the application.
+/// 4. Sign out from their account.
+///
+/// Key Features:
+/// - **Profile Picture**: Users can view and update their profile picture by accessing the device's camera.
+/// - **User Details**: Displays the user's name and email fetched from Firebase.
+/// - **Joined Date**: Shows the date when the user created their account on the application.
+/// - **Sign Out**: Provides an option for users to sign out from their account.
+///
+/// Dependencies:
+/// - `firestore.dart`: Used for database interactions.
+/// - `profile_picture.dart`: Provider to manage and update the profile picture.
+/// - `drawer.dart`: Represents the drawer widget used in this screen.
+/// - `authentication.dart`: Service for authentication related functionalities.
+///
+/// Usage:
+/// ```dart
+/// ProfileScreen()
+/// ```
+///
+/// By providing a seamless interface for viewing and updating profile details, this widget enhances user engagement and ensures a personalized user experience.
+
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
 
@@ -23,6 +49,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   var name = FirebaseAuth.instance.currentUser?.displayName;
   late TextEditingController usernameController = TextEditingController();
 
+  // ignore: unused_field
   File? _image;
 
   Future _pickImage(ImageSource source) async {

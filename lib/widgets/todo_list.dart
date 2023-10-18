@@ -1,6 +1,10 @@
+// ignore_for_file: library_private_types_in_public_api, no_leading_underscores_for_local_identifiers
+
 import 'package:flutter/material.dart';
 import 'package:flutter_project/models/todo_model.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_project/providers/todo_provider.dart';
+import 'package:provider/provider.dart';
 
 Widget todoList(
   BuildContext context,
@@ -19,6 +23,64 @@ Widget todoList(
   });
 
   final filteredTodos = todos.where((todo) => todo.status == status).toList();
+
+  void deleteTodo(Todo todo) {
+    Provider.of<TodoProvider>(context, listen: false).deleteTodo(todo);
+  }
+
+  Future<void> confirmDelete(Todo todo) async {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Row(
+            children: [
+              Text(
+                'Confirm Delete',
+                style: TextStyle(
+                    fontWeight: FontWeight.bold, color: Color(0xFFBD5F5F)),
+              ),
+            ],
+          ),
+          content: const Text('Are you sure you want to delete this task?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Delete'),
+              onPressed: () {
+                deleteTodo(todo); // Call the deleteTodo function
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _showEditDialog(BuildContext context, Todo todo) async {
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return EditTodoDialog(
+          todo: todo,
+          editTodo: (String title, String description, DateTime? dueDate) {
+            Provider.of<TodoProvider>(context, listen: false).editTodo(
+              todo,
+              title,
+              description,
+              dueDate,
+            );
+          },
+        );
+      },
+    );
+  }
 
   return ListView.separated(
     controller: scrollController,
@@ -95,13 +157,28 @@ Widget todoList(
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.edit,
+                    GestureDetector(
+                      onTap: () {
+                        _showEditDialog(
+                            context, todo); // Call the _showEditDialog function
+                      },
+                      child: Icon(
+                        Icons.edit,
                         color: Theme.of(context).colorScheme.background,
-                        size: 25.0),
+                        size: 25.0,
+                      ),
+                    ),
                     const SizedBox(width: 20.0),
-                    Icon(Icons.delete,
+                    GestureDetector(
+                      onTap: () {
+                        confirmDelete(todo); // Call the confirmDelete function
+                      },
+                      child: Icon(
+                        Icons.delete,
                         color: Theme.of(context).colorScheme.secondary,
-                        size: 25.0),
+                        size: 25.0,
+                      ),
+                    ),
                   ],
                 ),
               ],
@@ -113,4 +190,92 @@ Widget todoList(
     },
     separatorBuilder: (context, index) => const SizedBox(height: 8.0),
   );
+}
+
+class EditTodoDialog extends StatefulWidget {
+  final Todo todo;
+  final Function(String, String, DateTime?) editTodo;
+
+  const EditTodoDialog({
+    Key? key,
+    required this.todo,
+    required this.editTodo,
+  }) : super(key: key);
+
+  @override
+  _EditTodoDialogState createState() => _EditTodoDialogState();
+}
+
+class _EditTodoDialogState extends State<EditTodoDialog> {
+  final titleController = TextEditingController();
+  final descriptionController = TextEditingController();
+  final dueDateController = TextEditingController(); // Add this controller
+
+  @override
+  void initState() {
+    super.initState();
+    titleController.text = widget.todo.title ?? '';
+    descriptionController.text = widget.todo.description ?? '';
+    dueDateController.text = widget.todo.dueDate != null
+        ? DateFormat('MM/dd/yyyy').format(widget.todo.dueDate!)
+        : '';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Row(
+        children: [
+          Text(
+            'Edit Todo',
+            style: TextStyle(
+                fontWeight: FontWeight.bold, color: Color(0xFF203D4E)),
+          ),
+        ],
+      ),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          TextField(
+            controller: titleController,
+            decoration: const InputDecoration(labelText: 'Title'),
+          ),
+          TextField(
+            controller: descriptionController,
+            decoration: const InputDecoration(labelText: 'Description'),
+          ),
+          TextField(
+            controller: dueDateController, // Add this controller
+            decoration:
+                const InputDecoration(labelText: 'Due Date (MM/dd/yyyy)'),
+          ),
+        ],
+      ),
+      actions: <Widget>[
+        TextButton(
+          child: const Text('Cancel'),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+        TextButton(
+          child: const Text('Save'),
+          onPressed: () {
+            DateTime? dueDate;
+            final dueDateText = dueDateController.text;
+            if (dueDateText.isNotEmpty) {
+              dueDate = DateFormat('MM/dd/yyyy').parse(dueDateText);
+            }
+
+            widget.editTodo(
+              titleController.text,
+              descriptionController.text,
+              dueDate,
+            );
+            Navigator.of(context).pop();
+          },
+        ),
+      ],
+    );
+  }
 }
