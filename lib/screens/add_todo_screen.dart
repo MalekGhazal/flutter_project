@@ -67,6 +67,7 @@ class _AddTodoScreenState extends State<AddTodoScreen> {
     }
   }
 
+  //Function to validate text and date fields input
   void validateAndSubmitTodo() {
     if (titleController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -98,11 +99,11 @@ class _AddTodoScreenState extends State<AddTodoScreen> {
     if (email != null) {
       _submitUserTodoToFirestore();
     } else {
-      _submitAnonymousTodoLocally();
+      _submitUserTodoLocally();
     }
   }
 
-  void _submitAnonymousTodoLocally() {
+  void _submitUserTodoLocally() {
     Provider.of<TodoProvider>(context, listen: false).addTodo(
       titleController.text.trim(),
       descriptionController.text.trim(),

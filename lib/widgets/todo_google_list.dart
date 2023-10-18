@@ -11,10 +11,12 @@ void updateTodoStatus(DocumentReference reference, String newStatus) async {
 Widget todoGoogleList(AsyncSnapshot snapshot, BuildContext context) {
   Icon icon;
 
+  //Function to delete a task from Firestore
   Future deleteTask(id) async {
-  db.collection('tasks').doc(id).delete(); 
-}
+    db.collection('tasks').doc(id).delete();
+  }
 
+  //Function to display a confirmation dialog before deleting a task
   Future<void> confirmDelete(id) async {
     return showDialog(
       context: context,
@@ -40,7 +42,7 @@ Widget todoGoogleList(AsyncSnapshot snapshot, BuildContext context) {
             TextButton(
               child: const Text('Delete'),
               onPressed: () {
-                deleteTask(id);// Call the deleteTodo function
+                deleteTask(id); // Call the deleteTodo function
                 Navigator.of(context).pop();
               },
             ),
@@ -122,14 +124,36 @@ Widget todoGoogleList(AsyncSnapshot snapshot, BuildContext context) {
                       Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.edit,
+                          GestureDetector(
+                            onTap: () {
+                              String taskId = (data['id']);
+                              String taskName = (data['title']);
+                              String taskDesc = (data['description']);
+                              String taskDueDate = (data['dueDate']);
+                              Future.delayed(
+                                const Duration(seconds: 0),
+                                () => showDialog(
+                                  context: context,
+                                  builder: (context) => UpdateTaskAlertDialog(
+                                      taskId: taskId,
+                                      taskName: taskName,
+                                      taskDesc: taskDesc,
+                                      taskDueDate: taskDueDate),
+                                ), // Call the showDialog function to display the edit task dialog box
+                              );
+                            },
+                            child: Icon(
+                              Icons.edit,
                               color: Theme.of(context).colorScheme.background,
-                              size: 25.0),
+                              size: 25.0,
+                            ),
+                          ),
                           const SizedBox(width: 20.0),
                           GestureDetector(
                             onTap: () {
                               String taskId = data['id'];
-                              confirmDelete(taskId); // Call the confirmDelete function
+                              confirmDelete(
+                                  taskId); // Call the confirmDelete function
                             },
                             child: Icon(
                               Icons.delete,
@@ -146,4 +170,175 @@ Widget todoGoogleList(AsyncSnapshot snapshot, BuildContext context) {
               ));
         }).toList(),
       ));
+}
+
+class UpdateTaskAlertDialog extends StatefulWidget {
+  final String taskId, taskName, taskDesc, taskDueDate;
+
+  const UpdateTaskAlertDialog(
+      {Key? Key,
+      required this.taskId,
+      required this.taskName,
+      required this.taskDesc,
+      required this.taskDueDate})
+      : super(key: Key);
+
+  @override
+  State<UpdateTaskAlertDialog> createState() => _UpdateTaskAlertDialogState();
+}
+
+class _UpdateTaskAlertDialogState extends State<UpdateTaskAlertDialog> {
+  final TextEditingController titleController = TextEditingController();
+  final TextEditingController descriptionController = TextEditingController();
+  DateTime? dueDate;
+
+  //Function to assign the selected date to the "dueDate" variable
+  Future<void> selectDueDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: dueDate ?? DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2100),
+    );
+
+    if (picked != null && picked != dueDate) {
+      setState(() {
+        dueDate = picked;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    titleController.text = widget.taskName;
+    descriptionController.text = widget.taskDesc;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Row(
+        children: [
+          Text(
+            'Edit Todo',
+            style: TextStyle(
+                fontWeight: FontWeight.bold, color: Color(0xFF203D4E)),
+          ),
+        ],
+      ),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          TextField(
+            controller: titleController,
+            decoration: const InputDecoration(labelText: 'Title'),
+          ),
+          TextField(
+            controller: descriptionController,
+            decoration: const InputDecoration(labelText: 'Description'),
+          ),
+          Row(
+            children: [
+              Text(
+                'Due date:',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.primary,
+                  fontSize: 15.0,
+                ),
+              ),
+              const SizedBox(width: 8.0),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    (dueDate != null
+                        ? dueDate!.toLocal().toString().split(' ')[0]
+                        : widget.taskDueDate),
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                ],
+              ),
+              VerticalDivider(
+                width: 5,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              GestureDetector(
+                onTap: () {
+                  selectDueDate(context);
+                },
+                child: Icon(
+                  Icons.calendar_month_outlined,
+                  size: 25,
+                  color: Theme.of(context).colorScheme.secondary,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+      actions: <Widget>[
+        TextButton(
+          child: const Text('Cancel'),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+        TextButton(
+          child: const Text('Save'),
+          onPressed: () {
+            validateAndSubmitTodo();
+            Navigator.of(context, rootNavigator: true).pop();
+          },
+        ),
+      ],
+    );
+  }
+
+  //Function to validate text and date fields input and submit the edit
+  void validateAndSubmitTodo() {
+    if (titleController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter a title.'),
+        ),
+      );
+      return;
+    }
+
+    if (descriptionController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter a description.'),
+        ),
+      );
+      return;
+    }
+
+    final taskName = titleController.text;
+    final taskDesc = descriptionController.text;
+    final String taskDueDate = dueDate != null
+        ? dueDate!.toLocal().toString().split(' ')[0]
+        : widget.taskDueDate;
+    _updateTasks(taskName, taskDesc, taskDueDate);
+  }
+
+  //Function to update a task in Firestore
+  Future _updateTasks(
+      String taskName, String taskDesc, String taskDueDate) async {
+    var collection = db.collection('tasks');
+    collection.doc(widget.taskId).update(
+        {'title': taskName, 'description': taskDesc, 'dueDate': taskDueDate});
+  }
+
+  //Dispose the controllers
+  @override
+  void dispose() {
+    titleController.dispose();
+    descriptionController.dispose();
+    super.dispose();
+  }
 }
