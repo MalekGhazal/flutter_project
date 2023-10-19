@@ -303,7 +303,7 @@ class _UpdateTaskAlertDialogState extends State<UpdateTaskAlertDialog> {
     if (titleController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Please enter a title.'),
+          content: Text('Please ensure the new title is not empty.'),
         ),
       );
       return;
@@ -312,7 +312,7 @@ class _UpdateTaskAlertDialogState extends State<UpdateTaskAlertDialog> {
     if (descriptionController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Please enter a description.'),
+          content: Text('Please ensure the new description is not empty.'),
         ),
       );
       return;

@@ -152,7 +152,7 @@ Widget todoList(
                           fontSize: 13,
                         ),
                       )
-                    : Container(),
+                    : Container(width: 1),
                 const SizedBox(height: 8.0),
                 Row(
                   mainAxisSize: MainAxisSize.min,
@@ -209,16 +209,29 @@ class EditTodoDialog extends StatefulWidget {
 class _EditTodoDialogState extends State<EditTodoDialog> {
   final titleController = TextEditingController();
   final descriptionController = TextEditingController();
-  final dueDateController = TextEditingController(); // Add this controller
+  DateTime? dueDate;
+
+   //Function to assign the selected date to the "dueDate" variable
+  Future<void> selectDueDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: dueDate ?? DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2100),
+    );
+
+    if (picked != null && picked != dueDate) {
+      setState(() {
+        dueDate = picked;
+      });
+    }
+  }
 
   @override
   void initState() {
     super.initState();
     titleController.text = widget.todo.title ?? '';
     descriptionController.text = widget.todo.description ?? '';
-    dueDateController.text = widget.todo.dueDate != null
-        ? DateFormat('MM/dd/yyyy').format(widget.todo.dueDate!)
-        : '';
   }
 
   @override
@@ -244,10 +257,45 @@ class _EditTodoDialogState extends State<EditTodoDialog> {
             controller: descriptionController,
             decoration: const InputDecoration(labelText: 'Description'),
           ),
-          TextField(
-            controller: dueDateController, // Add this controller
-            decoration:
-                const InputDecoration(labelText: 'Due Date (MM/dd/yyyy)'),
+          Row(
+            children: [
+              Text(
+                'Due date:',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.primary,
+                  fontSize: 15.0,
+                ),
+              ),
+              const SizedBox(width: 8.0),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    (dueDate != null 
+                    ? dueDate!.toLocal().toString().split(' ')[0]
+                    : widget.todo.dueDate!.toLocal().toString().split(' ')[0]),
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                ],
+              ),
+              VerticalDivider(
+                width: 5,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              GestureDetector(
+                onTap: () {
+                  selectDueDate(context);
+                },
+                child: Icon(
+                  Icons.calendar_month_outlined,
+                  size: 25,
+                  color: Theme.of(context).colorScheme.secondary,
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -261,21 +309,50 @@ class _EditTodoDialogState extends State<EditTodoDialog> {
         TextButton(
           child: const Text('Save'),
           onPressed: () {
-            DateTime? dueDate;
-            final dueDateText = dueDateController.text;
-            if (dueDateText.isNotEmpty) {
-              dueDate = DateFormat('MM/dd/yyyy').parse(dueDateText);
-            }
-
-            widget.editTodo(
-              titleController.text,
-              descriptionController.text,
-              dueDate,
-            );
+            validateAndSubmitTodo();
             Navigator.of(context).pop();
           },
         ),
       ],
     );
+  }
+
+  //Function to validate text and date fields input and submit the edit
+  void validateAndSubmitTodo() {
+    if (titleController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please ensure the new title is not empty.'),
+        ),
+      );
+      return;
+    }
+
+    if (descriptionController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please ensure the new description is not empty.'),
+        ),
+      );
+      return;
+    }
+
+    DateTime? newDate;
+            dueDate != null
+              ? newDate = dueDate
+              : newDate = widget.todo.dueDate;
+            widget.editTodo(
+              titleController.text,
+              descriptionController.text,
+              newDate,
+            );
+  }
+
+   //Dispose the controllers
+  @override
+  void dispose() {
+    titleController.dispose();
+    descriptionController.dispose();
+    super.dispose();
   }
 }
