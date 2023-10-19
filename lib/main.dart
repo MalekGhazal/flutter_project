@@ -10,10 +10,10 @@ import 'package:flutter_project/screens/todos_screen.dart';
 import 'package:flutter_project/screens/weather_screen.dart';
 import 'package:flutter_project/services/authentication.dart';
 import 'package:flutter_project/widgets/drawer.dart';
-import '../theme/dark_theme.dart';
-import '../theme/light_theme.dart';
+import 'theme/theme.dart';
 import 'firebase_options.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter/services.dart';
 
 void main(List<String> args) async {
   // Ensure that Flutter is initialized and ready to use
@@ -47,6 +47,10 @@ class TodoApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
     return StreamBuilder<User?>(
         stream: AuthService().userStream,
         builder: (context, AsyncSnapshot<User?> snapshot) {
@@ -63,8 +67,7 @@ class TodoApp extends StatelessWidget {
             debugShowCheckedModeBanner: false,
 
             // Define the light and dark themes for the app
-            theme: lightTheme,
-            darkTheme: darkTheme,
+            theme: theme,
 
             // Define the app's routes for different screens
             routes: {
@@ -77,7 +80,7 @@ class TodoApp extends StatelessWidget {
                       ? TodoDataSource.google
                       : TodoDataSource.local)),
               DrawerRoutes.weather: (context) => const WeatherScreen(),
-              DrawerRoutes.profile: (context) => ProfileScreen(),
+              DrawerRoutes.profile: (context) => const ProfileScreen(),
             },
           );
         });

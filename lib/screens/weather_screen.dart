@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_project/theme/light_theme.dart';
+import 'package:flutter_project/theme/theme.dart';
 import 'package:flutter_project/widgets/drawer.dart';
 import '../models/weather_model.dart';
 import '../services/weather_service.dart';

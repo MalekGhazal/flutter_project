@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-ThemeData lightTheme = ThemeData(
+ThemeData theme = ThemeData(
   fontFamily: 'Montserrat',
   brightness: Brightness.light,
   appBarTheme: const AppBarTheme(
