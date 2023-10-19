@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_project/providers/profile_picture.dart';
 import 'package:flutter_project/services/authentication.dart';
-import 'package:flutter_project/theme/light_theme.dart';
+import 'package:flutter_project/theme/theme.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 
@@ -16,7 +16,7 @@ class TodoDrawer extends StatelessWidget {
 
   final user = FirebaseAuth.instance.currentUser;
   final email = FirebaseAuth.instance.currentUser?.email;
-  
+
   @override
   Widget build(BuildContext context) {
     File? image = Provider.of<ProfilePicture>(context).userImage;
